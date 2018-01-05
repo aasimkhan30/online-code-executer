@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SPIT Judge | Home</title>
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="stylesheets/bootstrap.min.css" media="screen,projection"/>
+
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <style>
+        body {
+            background: url(images/home_wallpaper.jpg) no-repeat center center fixed;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+        }
+
+        ::-webkit-input-placeholder { /* WebKit browsers */
+            color: black;
+            opacity: 1 !important;
+        }
+
+        .nav.navbar-nav.navbar-right {
+            color: white;
+        }
+
+        .custom {
+            position: absolute;
+            top:25%;
+            width: 100%;
+            text-align: center;
+        }
+        .navbar {
+            background:#232323;
+        }
+
+
+    </style>
+</head>
+<body>
+<script type="text/javascript" src="/javascripts/jquery-3.2.0.min.js"></script>
+
+<script type="text/javascript" src="javascripts/bootstrap.min.js"></script>
+
+<nav class="navbar navbar-toggleable-md navbar-inverse bg-faded ">
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+            aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <img src="/images/logo.png" width="40" height="40" class="d-inline-block align-top" alt="">
+    <a class="navbar-brand" href="/home" style="margin-left: 10px;"> <%= title %></a>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="/home">Home<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/file_browser">Your Files</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link " href="/quickrun">Quickrun</a>
+            </li>
+        </ul>
+        <span class="navbar-text">
+            Welcome : <%= username %>
+        </span>
+        <a class="btn btn-outline-warning my-2 my-sm-0" href="/logout" style="margin-left: 10px;">Logout</a>
+    </div>
+</nav>
+<div class="custom">
+
+            <a class="btn btn-outline-secondary my-2 my-sm-0" href="/quickrun" class="btn">Quick Run Your Code</a>
+            <a class="btn btn-outline-secondary my-2 my-sm-0" href="/file_browser" class="btn">View Your Cloud Files</a>
+</div>
+
+
+
+
+
+</body>
+</html>

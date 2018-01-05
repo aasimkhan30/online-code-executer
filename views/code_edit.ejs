@@ -1,0 +1,185 @@
+<html>
+<head>
+
+    <title><%= title %></title>
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="stylesheets/bootstrap.min.css" media="screen,projection"/>
+
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <style type="text/css" media="screen">
+        #editor {
+            position: relative;
+            width: calc(100%-100px);
+            height: 60%;
+            margin-left: 50px;
+            margin-right: 50px;
+        }
+
+        .FixedHeightContainer
+        {
+            height: 230px;
+            width: calc(100%-100px);
+            padding:3px;
+            background:#F8F9FA;
+            margin-left: 50px;
+            margin-right: 50px;
+            text-align: center;
+            border-style: solid;
+            border-color: #000000 ;
+        }
+        .Content
+        {
+            height:170px;
+            overflow:auto;
+            background:#000;
+            color:#00C853;
+            text-align: left;
+            padding: 10px;
+        }
+        .inputform{
+            width: calc(100%-100px);
+            padding:3px;
+            margin: 30px;
+            text-align: center;
+        }
+    </style>
+
+</head>
+<body style="background:#F5F5DC">
+
+<script type="text/javascript" src="/javascripts/jquery-3.2.0.min.js"></script>
+<script type="text/javascript" src="javascripts/bootstrap.min.js"></script>
+
+
+<nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse  ">
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+            aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <img src="/images/logo.png" width="40" height="40" class="d-inline-block align-top" alt="">
+    <a class="navbar-brand" href="/home" style="margin-left: 10px;"> <%= title %></a>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item ">
+                <a class="nav-link" href="/home">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/file_browser">Your Files</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link " href="/quickrun">Quickrun <span class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+        <span class="navbar-text">
+            Welcome : <%= username %>
+        </span>
+        <a class="btn btn-outline-warning my-2 my-sm-0" href="/logout" style="margin-left: 10px;">Logout</a>
+    </div>
+</nav>
+
+<div class="form-group" style="text-align:center;margin-top: 20px;">
+    <label for="exampleSelect2">Select Your Language</label>
+    <select id="language">
+        <option value="" disabled selected>Choose your option</option>
+        <option value="c">C</option>
+        <option value="c++">C++</option>
+        <option value="java">Java</option>
+    </select>
+</div>
+
+<div id="editor"></div>
+<div class="inputform">
+    <label for="textarea1">Custom Input</label><br>
+    <textarea id="input" class="materialize-textarea" style="width: calc(100% - 50px)"></textarea><br><br>
+    <button class="btn btn-primary" type="button" onclick="runcode()">Run Code</button>
+</div>
+
+
+<div class="FixedHeightContainer">
+    <p>Output</p>
+    <div class="Content" id="output">
+        Your Output will be displayed here.
+    </div>
+</div>
+
+
+<script src="javascripts/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+<script>
+    $(document).ready(function () {
+        console.log("C is selected");
+        editor.getSession().setMode("ace/mode/c_cpp");
+        editor.setValue("#include<stdio.h>\n" +
+            "#include<stdlib.h>\n" +
+            "int main(){\n\n\n\n\n\n\n\n" +
+            " /\/\enter your code here \n" +
+            "return 0;\n"+
+            "}\n",1);
+        $('#language').val('c');
+    });
+
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/monokai");
+    editor.getSession().setMode("ace/mode/c_cpp");
+    $('#language').on('change', function () {
+
+        if (this.value == "c") {
+            console.log("C is selected");
+            editor.getSession().setMode("ace/mode/c_cpp");
+            editor.setValue("#include<stdio.h>\n" +
+                "#include<stdlib.h>\n" +
+                "int main(){\n\n\n\n\n\n\n\n" +
+                " /\/\enter your code here \n" +
+                    "return 0;\n"+
+                "}\n",1);
+        }
+        if (this.value == "java") {
+            console.log("Java is selected");
+
+            editor.getSession().setMode("ace/mode/java");
+            editor.setValue("import java.io.*;\n " +
+                "class spit_judge { \n  " +
+                "public static void main(String args[]){\n" +
+                 "//enter your code\n\n\n\n\n"+
+                "}\n" +
+                "}\n",1);
+
+        }
+        if (this.value == "c++") {
+            console.log("C++ is selected");
+            editor.getSession().setMode("ace/mode/c_cpp");
+            editor.setValue("#include<iostream> \n" +
+                "using namespace std; \n" +
+                "int main(){ \n\n\n\n\n\n\n\n\n " +
+                    "return 0;\n"+
+                "}\n",1);
+        }
+    })
+
+
+    function runcode() {
+        value = editor.getValue();
+        lang = $("#language").val();
+        input = $('#input').val();
+        console.log(input);
+        $('#output').text("Loading");
+
+        $.post("/users/runcode",
+            {
+                "code": value,
+                "lang": lang,
+                "input": input
+            },
+            function (data, status) {
+                var obj = $('#output').text(data);
+                obj.html(obj.html().replace(/\n/g,'<br/>'));
+            });
+
+    }
+
+</script>
+</body>
+</html>

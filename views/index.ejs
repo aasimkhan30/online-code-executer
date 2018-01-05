@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title><%= title %></title>
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="stylesheets/materialize.min.css" media="screen,projection"/>
+
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <style>
+        body {
+            background: url(images/login_wallpaper.png) no-repeat center center fixed;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+        }
+
+        ::-webkit-input-placeholder { /* WebKit browsers */
+            color: black;
+            opacity: 1 !important;
+        }
+    </style>
+</head>
+<body>
+<script type="text/javascript" src="/javascripts/jquery-3.2.0.min.js"></script>
+<script type="text/javascript" src="javascripts/materialize.min.js"></script>
+<script>
+
+    $(document).ready(function() {
+        $("#login_form").submit(function(event) {
+            console.log("Submit Called");
+            username = $('#username').val();
+            password = $('#password').val();
+            if(username == "" || password ==""){
+                alert('Please Enter Both Username And Password')
+                event.preventDefault();
+            }
+        });
+    });
+</script>
+
+
+
+<div class="row">
+    <form class="col s12 m6 offset-m6 l4 offset-l8" id="login_form" action="/login" method="post">
+        <h1>Login</h1>
+
+        <div class="input-field col s12">
+            <input placeholder="Username" id="username" name="username" type="text" class="validate">
+        </div>
+        <div class="input-field col s12">
+            <input placeholder="Password" id="password" name="password" type="password" class="validate">
+        </div>
+        <div class="input-field col s6">
+            <input type="submit" class="btn-flat  blue-text white">
+        </div>
+        <div class="input-field col s6">
+            <a href="/registerpage" class="btn-flat  blue-text white">Register</a>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

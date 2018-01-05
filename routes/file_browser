@@ -1,0 +1,198 @@
+var express = require('express');
+var router = express.Router();
+var fs = require('fs');
+var pathmod = require('path')
+var fileExtension = require('file-extension');
+
+router.get('/', function (req, res) {
+    path = req.query.path;
+    username = req.session.username;
+    rootpath = null;
+    files = [];
+    directory = [];
+    relativepath = path;
+    //path logic
+    if (path == null || path =='') {
+        res.redirect("/file_browser/?path=/");
+    }
+    else {
+        path = path.replace ("//","/");
+        relativepath = path;
+        path = "./user_files/" + username + '/' + path;
+
+    }
+
+    // go up logic
+
+    rootpath = pathmod.dirname(path);
+    //console.log(rootpath);
+
+    if(rootpath == './user_files' || rootpath =='./user_files/'+username){
+        rootpath = '/';
+    }
+    else{
+        var remstr = "./user_files/" + username + '/';
+        rootpath = rootpath.replace(remstr.toString(), "");
+    }
+
+
+
+    // getting listing of all files
+    var listing = fs.readdirSync(path);
+    for (var i = 0; i < listing.length; i++) {
+        var file = new Object();
+        file = fs.lstatSync(path + "/" + listing[i]);
+        file.name = listing[i];
+        if (fs.lstatSync(path + "/" + listing[i]).isDirectory()) {
+
+            fpath = path + "/" + listing[i];
+            var remstr = "./user_files/" + username + '/';
+            fpath = fpath.replace(remstr.toString(), "");
+            file.path = fpath;
+            directory.push(file);
+
+        }
+        else {
+
+            fpath = path + "/" + listing[i];
+            var remstr = "./user_files/" + username + '/';
+            fpath = fpath.replace(remstr.toString(), "");
+            file.path = fpath;
+            file.extention = fileExtension(listing[i]);
+            //console.log(file.extention);
+            files.push(file);
+        }
+    }
+
+    //generating response to render
+    response = {
+        "title": "SPIT_JUDGE",
+        "relative": relativepath,
+        "root": rootpath,
+        "files": files,
+        "directories": directory
+    };
+    //console.log(response);
+    //console.log(response);
+    res.render('file_browser', response);
+});
+
+
+router.get('/code_execute',function (req,res) {
+        relativepath = req.query.path;
+        extention = req.query.ext;
+        username = req.session.username;
+        if(relativepath == null || relativepath == ""){
+            res.redirect('/file_browser/?path=');
+        }
+        else{
+
+            path = "./user_files/" + username + '/' + relativepath;
+
+            rootpath = pathmod.dirname(path);
+           // console.log(rootpath);
+
+            if(rootpath == './user_files' || rootpath =='./user_files/'+username){
+                rootpath = '/';
+            }
+            else{
+                var remstr = "./user_files/" + username + '/';
+                rootpath = rootpath.replace(remstr.toString(), "");
+            }
+
+
+            if(fs.lstatSync(path).isDirectory())
+                res.redirect('/file_browser/?path='+relativepath);
+            else{
+                var content = fs.readFileSync(path, 'utf8');
+            }
+
+            if(extention == 'cpp')
+                extention = "c++";
+
+            response = {
+                "title":"SPIT Judge",
+                "filedata":content,
+                "root":rootpath,
+                "extention":extention,
+                "relative":relativepath
+            };
+
+
+            //console.log(response);
+            if(extention == "c++" || extention == "java" || extention == "c")
+                res.render('normal_executer',response)
+            else
+                res.render('normal_viewer',response)
+        }
+});
+
+
+router.post('/save_code',function (req,res) {
+    relativepath = req.body.path;
+    data = req.body.code;
+    username = req.session.username;
+    if(relativepath == null || relativepath == ""){
+        res.redirect('/file_browser/?path=');
+    }
+    else{
+
+        path = "./user_files/" + username + '/' + relativepath;
+        fs.truncateSync(path,0);
+        fs.writeFile(path,data,function(err,docs){
+            res.send("success");
+        });
+
+
+    }
+});
+
+router.post('/newfolder',function (req,res) {
+   foldername = req.body.folder;
+   username = req.session.username;
+   path = req.body.path;
+   console.log(req.body);
+   relative = path
+   path = "./user_files/" + username + '/' + path + '/'+foldername;
+    var mkdirp = require('mkdirp');
+    mkdirp(path , function (err) {
+        if (err) console.error(err);
+        else console.log('pow!');
+        res.redirect("/file_browser/?path="+relative );
+    });
+});
+router.post('/upload',function (req,res) {
+    var formidable = require('formidable');
+    var form = new formidable.IncomingForm();
+    var util = require('util');
+    form.parse(req, function(err, fields, files) {
+        if(err)
+            console.log(err);
+        console.log(fields);
+        file = req.body.file;
+        dpath = fields.path;
+        relativepath = dpath;
+        username = req.session.username;
+        dpath = "./user_files/" + username + '/' + dpath;
+        //console.log("File :"+file);
+        console.log("Path :"+dpath);
+       // console.log(util.inspect({fields: fields, files: files}));
+        path = files.file.path;
+       // console.log(files.file);
+        name= files.file.name;
+        content = fs.readFileSync(path, 'utf8');
+        console.log(path);
+        fs.unlinkSync(path);
+        fs.writeFileSync(dpath+'/'+name,content);
+        //fs.unlinkSync(path);
+      //  console.log(files);
+        res.send("success");
+
+    });
+
+
+
+});
+
+
+module.exports = router;

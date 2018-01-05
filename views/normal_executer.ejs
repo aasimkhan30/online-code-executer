@@ -1,0 +1,136 @@
+<html>
+<head>
+
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css'/>
+    <style type="text/css" media="screen">
+        #editor {
+            position: relative;
+            width: 90%;
+            height: 60%;
+        }
+    </style>
+</head>
+<body>
+<script src="/javascripts/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" src="/javascripts/jquery-3.2.0.min.js"></script>
+<a href="/home">Home</a>  |
+<a href="/file_browser">File Browser</a>   |
+<a href="/quickrun">Code Edit</a>
+<h1><%= title %> Quickrun</h1>
+<div class="input-field col s12 browser-default">
+    <select id="language" disabled>
+        <option value="" disabled selected>Choose your option</option>
+        <option value="c">C</option>
+        <option value="c++">C++</option>
+        <option value="java">Java</option>
+    </select>
+    <label>Language Select</label>
+</div>
+<a href="/file_browser/?path=<%=root%>"> Go Up</a>
+
+<p id="infotext"></p>
+<div id="editor"><%= filedata %></div>
+
+<div class="row">
+    <form class="col s12">
+        <div class="row">
+            <div class="input-field col s6">
+                <textarea id="input" class="materialize-textarea"></textarea>
+                <label for="textarea1">Custom Input</label>
+            </div>
+            <div class="input-field col s6">
+                <textarea id="output" class="materialize-textarea" disabled>Your Output</textarea>
+            </div>
+        </div>
+        <button class="btn" type="button" onclick="runcode()">Run Code</button>
+        <button class="btn" type="button" onclick="savefile()">Save File</button>
+
+    </form>
+
+</div>
+<script src="javascripts/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+<script>
+    $(document).ready(function () {
+        console.log("C is selected");
+        $('#language').val('<%=extention%>');
+    });
+
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/monokai");
+    editor.getSession().setMode("ace/mode/c_cpp");
+    $('#language').on('change', function () {
+
+        if (this.value == "c") {
+            console.log("C is selected");
+            editor.getSession().setMode("ace/mode/c_cpp");
+            editor.setValue("#include<stdio.h>\n" +
+                "#include<stdlib.h>\n" +
+                "int main(){\n\n\n\n\n\n\n\n" +
+                " /\/\enter your code here \n" +
+                "return 0;\n"+
+                "}\n",1);
+        }
+        if (this.value == "java") {
+            console.log("Java is selected");
+
+            editor.getSession().setMode("ace/mode/java");
+            editor.setValue("import java.io.*;\n " +
+                "class spit_judge { \n  " +
+                "public static void main(String args[]){\n" +
+                "//enter your code\n\n\n\n\n"+
+                "}\n" +
+                "}\n",1);
+
+        }
+        if (this.value == "c++") {
+            console.log("C++ is selected");
+            editor.getSession().setMode("ace/mode/c_cpp");
+            editor.setValue("#include<iostream> \n" +
+                "using namespace std; \n" +
+                "int main(){ \n\n\n\n\n\n\n\n\n " +
+                "return 0;\n"+
+                "}\n",1);
+        }
+    })
+
+
+    function runcode() {
+        value = editor.getValue();
+        lang = $("#language").val();
+        input = $('#input').val();
+        console.log(input);
+        $('#output').text("Loading");
+        $("#infotext").text("Executing");
+
+        $.post("/users/runcode",
+            {
+                "code": value,
+                "lang": lang,
+                "input": input
+            },
+            function (data, status) {
+                $('#output').text(data);
+                $("#infotext").text("Done");
+
+            });
+
+    }
+
+    function savefile(){
+        value = editor.getValue();
+        path = "<%=relativepath%>";
+        $("#infotext").text("Saving");
+        $.post("/file_browser/save_code",
+            {
+                "code": value,
+                "path":path
+            },
+            function (data, status) {
+                $("#infotext").text("Saved");
+            });
+    }
+
+</script>
+</body>
+</html>

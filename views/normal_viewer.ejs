@@ -1,0 +1,124 @@
+<html>
+<head>
+
+    <title><%= title %></title>
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="/stylesheets/bootstrap.min.css" media="screen,projection"/>
+
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <style type="text/css" media="screen">
+        #editor {
+            position: relative;
+            width: calc(100%-100px);
+            height: 60%;
+            margin-left: 50px;
+            margin-right: 50px;
+        }
+
+        .FixedHeightContainer
+        {
+            height: 230px;
+            width: calc(100%-100px);
+            padding:3px;
+            background:#F8F9FA;
+            margin-left: 50px;
+            margin-right: 50px;
+            text-align: center;
+            border-style: solid;
+            border-color: #000000 ;
+        }
+        .Content
+        {
+            height:170px;
+            overflow:auto;
+            background:#000;
+            color:#00C853;
+            text-align: left;
+            padding: 10px;
+        }
+        .inputform{
+            width: calc(100%-100px);
+            padding:3px;
+            margin: 30px;
+            text-align: center;
+        }
+    </style>
+
+</head>
+<body>
+<script src="/javascripts/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" src="/javascripts/jquery-3.2.0.min.js"></script>
+<script type="text/javascript" src="/javascripts/bootstrap.min.js"></script>
+
+<nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse  ">
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+            aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <img src="/images/logo.png" width="40" height="40" class="d-inline-block align-top" alt="">
+    <a class="navbar-brand" href="/home" style="margin-left: 10px;"> <%= title %></a>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item ">
+                <a class="nav-link" href="/home">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/file_browser">Your Files</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link " href="/quickrun">Quickrun <span class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+        <span class="navbar-text">
+            Welcome : <%= username %>
+        </span>
+        <a class="btn btn-outline-warning my-2 my-sm-0" href="/logout" style="margin-left: 10px;">Logout</a>
+    </div>
+</nav>
+<div class="container">
+    <br><br>
+<a class="btn btn-warning" href="/file_browser/?path=<%=root%>"> Go Up</a><br><br>
+<p id="infotext" class="alert alert-success"></p>
+<div id="editor"><%= filedata %></div>
+<br>
+
+
+<button class="btn btn-success" type="button" onclick="savefile()">Save File</button>
+</div>
+
+<script src="javascripts/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+<script>
+    $(document).ready(function () {
+        $("#infotext").hide();
+    });
+
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/monokai");
+    editor.getSession().setMode("ace/mode/c_cpp");
+
+    function savefile(){
+        value = editor.getValue();
+        path = "<%=relativepath%>";
+        $("#infotext").text("Saving");
+        $.post("/file_browser/save_code",
+            {
+                "code": value,
+                "path":path
+            },
+            function (data, status) {
+                $("#infotext").text("Saved");
+                $("#infotext").show();
+                setTimeout(function () {
+                    $("#infotext").hide();
+
+                },3000);
+            });
+    }
+
+</script>
+</body>
+</html>

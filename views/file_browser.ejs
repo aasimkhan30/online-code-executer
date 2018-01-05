@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="/stylesheets/bootstrap.min.css" media="screen,projection"/>
+
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+<body>
+<script type="text/javascript" src="/javascripts/jquery-3.2.0.min.js"></script>
+<script type="text/javascript" src="/javascripts/bootstrap.min.js"></script>
+
+<nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse  ">
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+            aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <img src="/images/logo.png" width="40" height="40" class="d-inline-block align-top" alt="">
+    <a class="navbar-brand" href="/home" style="margin-left: 10px;"> <%= title %></a>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item ">
+                <a class="nav-link" href="/home">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/file_browser">Your Files</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link " href="/quickrun">Quickrun <span class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+        <span class="navbar-text">
+            Welcome : <%= username %>
+        </span>
+        <a class="btn btn-outline-warning my-2 my-sm-0" href="/logout" style="margin-left: 10px;">Logout</a>
+    </div>
+</nav>
+<div class="container">
+<br><br>
+<h6 class="alert alert-info" >Current Path  :: <%= relative %></h6>
+    <a class="btn btn-warning " href="/file_browser/?path=<%=root%>"> Go Up</a>
+    <button class="btn btn-warning " data-toggle="modal" data-target="#newfoldermodel" >New Folder</button><br><br>
+
+    <input type="hidden" id="path" name="path" value="<%= relative %>" >
+    <input type="file"  id="files"  name="files">
+    <input type="submit"  class="btn btn-success" value="Upload File" name="submit" onclick="uploadfile()"><br><br>
+    <span id = "status"></span>
+
+
+<table  class="table">
+    <thead>
+    <tr>
+        <th>...</th>
+        <th>Icon</th>
+        <th>Files_name</th>
+        <th>Kind</th>
+        <th>Size</th>
+        <th>Date_created</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% for (var i = 0 ; i < directories.length ; i++ ){%>
+    <tr>
+        <td> <input type="checkbox" >  </td>
+        <td><img height="30px" width="30px" src="/images/foldericon.png"> </td>
+        <td><a href="/file_browser?path=<%= directories[i].path  %>"><%=  directories[i].name %></a></td>
+        <td> Dir </td>
+        <td> <%=  directories[i].size  %> </td>
+        <td><%=  directories[i].birthtime  %></td>
+    </tr>
+    <%}%>
+    <% for (var i = 0 ; i < files.length ; i++ ){%>
+    <tr>
+        <td> <input type="checkbox" >  </td>
+        <td> <img height="30px" width="30px" src="/images/fileicon.png"></td>
+        <td><a href="/file_browser/code_execute?path=<%= files[i].path  %>&ext=<%=files[i].extention%>"><%=  files[i].name %></a></td>
+        <td><%=  files[i].extention %></td>
+        <td><%= files[i].size %></td>
+        <td><%=  files[i].birthtime %></td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="newfoldermodel" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="/file_browser/newfolder" method="post">
+                    <input type="hidden" name="path" value="<%=relative%>" >
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Folder</label>
+                        <input type="text" class="form-control" id="foldername" name="folder" aria-describedby="emailHelp" placeholder="Enter Folder Name">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Folder</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function uploadfile(){
+
+        if($("#files")[0].files[0] != null ) {
+            var fd = new FormData();
+            fd.append('file', $("#files")[0].files[0]);
+            console.log(document.getElementById("path").value);
+            fd.append('path', document.getElementById("path").value);
+            for (var pair of fd.entries()) {
+                console.log(pair[1]);
+            }
+            $.ajax({
+                url: "/file_browser/upload",
+                type: 'POST',
+                data: fd,
+                success: function (data) {
+                    console.log(data);
+                    location.reload();
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        }
+    }
+</script>
+
+</body>
+</html>
